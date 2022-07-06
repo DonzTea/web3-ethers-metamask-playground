@@ -64,5 +64,6 @@ export function callContractMethod(
   methodName: string,
   payload: Array<any> = [],
 ): Promise<any> {
+  console.log('...payload', ...payload);
   return contract?.[methodName](...payload);
 }

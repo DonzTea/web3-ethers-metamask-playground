@@ -1,4 +1,4 @@
-import { Contract } from 'ethers';
+import { Contract, ethers } from 'ethers';
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { useWeb3Context } from 'web3-react';
 import {
@@ -13,22 +13,35 @@ export default function TransferCard(): ReactElement {
   const recipientInput = useRef<HTMLInputElement>(null);
   const amountInput = useRef<HTMLInputElement>(null);
 
+  let signer: ethers.providers.JsonRpcSigner;
   let contract: Contract;
   useEffect(() => {
     const walletAddress = context.account;
     if (walletAddress) {
-      const _signer = createSigner(walletAddress as string);
-      const _contract = createContract(_signer);
-      contract = _contract;
+      signer = createSigner(walletAddress as string);
+      contract = createContract(signer);
     }
   }, [context]);
 
-  function onSend(): void {
+  async function onSend(): Promise<void> {
     const recepient = recipientInput.current?.value;
     const amount = amountInput.current?.value;
-    callContractMethod(contract, 'approve', [recepient, amount])
-      .then((res) => console.log('res', res))
-      .catch((error) => console.error(error));
+
+    // * via call contract method
+    // callContractMethod(contract, 'approve', [recepient, amount])
+    //   .then((res) => console.log('res', res))
+    //   .catch((error) => console.error(error));
+
+    // * via signer encoded function call
+    // const fn = contract.interface.getFunction('transfer');
+    // const data = contract.interface.encodeFunctionData(fn, [recepient, amount]);
+    // const tx = await signer.sendTransaction({
+    //   value: 0x0,
+    //   from: context.account as string,
+    //   to: recepient,
+    //   data,
+    // });
+    // console.log('tx', tx);
   }
 
   return (
